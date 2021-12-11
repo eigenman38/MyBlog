@@ -1,4 +1,5 @@
-﻿@*<Top>*@
+﻿@attribute [Authorize]
+@*<Top>*@
 @page "/admin/categories"
 @using MyBlogServerSide.Components
 @inject IMyBlogApi api
@@ -17,55 +18,55 @@
 <ItemList Items="Items" DeleteEvent="@Delete" SelectEvent="@Select" ItemType="Category">
     <ItemTemplate>
         @{ var item = context as Category;
-                            if (item != null)
-                            {
-            @item.Name;
-        } }
+            if (item != null)
+            {
+@item.Name;
+} }
     </ItemTemplate>
 </ItemList>
 @*</List>*@
 
 @*<Code>*@
 @code { private List<Category> Items { get; set; } = new List<Category>();
-            public Category Item { get; set; } = new Category();
+    public Category Item { get; set; } = new Category();
 
-            protected async override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
+    {
+        Items = await api.GetCategoriesAsync();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Delete(Category category)
+    {
+        try
+        {
+            await api.DeleteCategoryAsync(category);
+            Items.Remove(category);
+        }
+        catch { }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            if (Item.Id == 0)
             {
-                Items = await api.GetCategoriesAsync();
-                await base.OnInitializedAsync();
+                Items.Add(Item);
             }
+            await api.SaveCategoryAsync(Item);
+            Item = new Category();
+        }
+        catch { }
+    }
 
-            private async Task Delete(Category category)
-            {
-                try
-                {
-                    await api.DeleteCategoryAsync(category);
-                    Items.Remove(category);
-                }
-                catch { }
-            }
-
-            private async Task Save()
-            {
-                try
-                {
-                    if (Item.Id == 0)
-                    {
-                        Items.Add(Item);
-                    }
-                    await api.SaveCategoryAsync(Item);
-                    Item = new Category();
-                }
-                catch { }
-            }
-
-            private Task Select(Category category)
-            {
-                try
-                {
-                    Item = category;
-                }
-                catch { }
-                return Task.CompletedTask;
-            } }
+    private Task Select(Category category)
+    {
+        try
+        {
+            Item = category;
+        }
+        catch { }
+        return Task.CompletedTask;
+    } }
 @*</Code>*@

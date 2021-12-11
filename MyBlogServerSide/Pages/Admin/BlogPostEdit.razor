@@ -1,4 +1,5 @@
-﻿@*<top>*@
+﻿@attribute [Authorize]
+@*<top>*@
 @page "/admin/blogposts/new"
 @page "/admin/blogposts/{Id:int}"
 @inject IMyBlogApi api
@@ -29,8 +30,7 @@
 else
 {
 <button type="button" @onclick="@(() => { Post.Tags.Add(tag); })">Add</button>}
-</li>
-}
+</li>}
     </ul>
     <InputTextAreaOnInput @bind-Value="Post.Text" @onkeyup="UpdateHTML"></InputTextAreaOnInput>
     <button type="submit" class="btn btn-success">Save</button>
